@@ -2,17 +2,10 @@ import argparse
 import mariadb
 import json
 import os
-from datetime import datetime
 from getpass import getpass
 
 from model import execute
-
-
-class AuthenticationError(Exception):
-    """Generic authentication error.
-    """
-    def __init__(self, message):
-        super().__init__(message)
+from error import AuthenticationError
 
 
 class GlobalArguments(object):

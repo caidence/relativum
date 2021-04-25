@@ -1,14 +1,9 @@
 import mariadb
 
-
-class InvalidTableNameError(Exception):
-    def __init__(self, message):
-        super().__init__(message)
-
-
-class RequirementsNotMetError(Exception):
-    def __init__(self, message):
-        super().__init__(message)
+from error import (
+    InvalidTableNameError,
+    RequirementsNotMetError
+)
 
 
 def execute(connection, arguments):
