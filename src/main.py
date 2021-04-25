@@ -29,7 +29,7 @@ class GlobalArguments(object):
         self.parser.add_argument(
             '-d', '--database', action='store', dest='database', help='Database name', default='payroll_management')
         self.parser.add_argument(
-            '-c', action='store_true', dest='cache', help='Cache credentials', required=False, default=None)
+            '-c', '--cache', action='store_true', dest='cache', help='Cache credentials', required=False, default=None)
 
     def __create_interaction_arguments(self):
         """Create arguments for interacting with the database.
@@ -54,6 +54,10 @@ class GlobalArguments(object):
             '-j', '--job_id', action='store', dest='job_id', help='Employee job ID', default=None)
         self.parser.add_argument(
             '-e', '--employee_id', action='store', dest='employee_id', help='Employee ID', default=None)
+        self.parser.add_argument(
+            '-D', '--department_name', action='store', dest='department_name', help='Department name', default=None)
+        self.parser.add_argument(
+            '-i', '--department_id', action='store', dest='department_id', help='Department ID', default=None)
 
 
 class Authenticator(object):

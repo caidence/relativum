@@ -21,7 +21,8 @@ def execute(connection, arguments):
     elif arguments.add is not None:
         # Dictionary of add functors and associated tables
         options = {
-            'employee': add_employee
+            'employee': add_employee,
+            'department': add_department
         }
         if arguments.add not in options.keys():
             msg = '{} is not a valid table'.format(arguments.add)
@@ -33,7 +34,8 @@ def execute(connection, arguments):
     elif arguments.remove is not None:
         # Dictionary of add functors and associated tables
         options = {
-            'employee': remove_employee
+            'employee': remove_employee,
+            'department': remove_department
         }
         if arguments.remove not in options.keys():
             msg = '{} is not a valid table'.format(arguments.add)
@@ -134,6 +136,24 @@ def add_employee(cursor, arguments):
     print('Successfully inserted the values')
 
 
+def remove_helper(cursor, arguments, valid_arguments, table_name):
+    # Make sure one of these arguments were passed to the program
+    validate_command(arguments, valid=valid_arguments)
+    all_args = vars(arguments)
+    search_params = dict()
+
+    # Select the attribute the user decided to remove an employee by (remove by first_name, last_name, etc.)
+    for arg in valid_arguments:
+        if all_args[arg] is not None:
+            search_params.update({'attribute': arg, 'value': vars(arguments)[arg]})
+    print(search_params)
+
+    sql = 'DELETE FROM {} WHERE {} like ?'.format(table_name, search_params['attribute'])
+    value = (search_params['value'],)
+    cursor.execute(sql, value)
+    print('Successfully removed the values')
+
+
 def remove_employee(cursor, arguments):
     """Remove an employee from the employee table.
 
@@ -147,19 +167,21 @@ def remove_employee(cursor, arguments):
     :param arguments: All arguments passed to program.
     :return:
     """
-    # Make sure one of these arguments were passed to the program
     valid_args = ('first_name', 'last_name', 'employee_id')
-    validate_command(arguments, valid=valid_args)
-    all_args = vars(arguments)
-    search_params = dict()
+    remove_helper(cursor, arguments, valid_args, 'employee')
 
-    # Select the attribute the user decided to remove an employee by (remove by first_name, last_name, etc.)
-    for arg in valid_args:
-        if all_args[arg] is not None:
-            search_params.update({'attribute': arg, 'value': vars(arguments)[arg]})
-    print(search_params)
 
-    sql = 'DELETE FROM employee WHERE {} like ?'.format(search_params['attribute'])
-    value = (search_params['value'],)
-    cursor.execute(sql, value)
-    print('Successfully removed the values')
+def add_department(cursor, arguments):
+    required_args = ('department_name',)
+    validate_command(arguments, required=required_args)
+
+    sql = 'INSERT INTO department (department_name) VALUES (?)'
+    values = (arguments.department_name,)
+    print(values)
+    cursor.execute(sql, values)
+    print('Successfully added values.')
+
+
+def remove_department(cursor, arguments):
+    valid_args = ('department_id', 'department_name')
+    remove_helper(cursor, arguments, valid_args, 'department')
