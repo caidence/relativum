@@ -1,5 +1,5 @@
 # relativum -- Latin (adjective) In relation to
-=========================
+------------------------------------------------
 
 ## Getting started
 
