@@ -1,9 +1,7 @@
-# reletivum
-Payroll Management CS-665
+# relativum -- Latin (adjective) In relation to
 =========================
 
 ## Getting started
--------------------
 
 First, let's cache your database credentials. There are two ways:
 
