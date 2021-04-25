@@ -2,7 +2,10 @@ import argparse
 import mariadb
 import json
 import os
+from datetime import datetime
 from getpass import getpass
+
+from model import execute
 
 
 class AuthenticationError(Exception):
@@ -16,6 +19,8 @@ class GlobalArguments(object):
     def __init__(self):
         self.parser = argparse.ArgumentParser()
         self.__create_authentication_args()
+        self.__create_interaction_arguments()
+        self.__create_general_arguments()
 
         self.args = self.parser.parse_args()
 
@@ -23,15 +28,37 @@ class GlobalArguments(object):
         """Create basic arguments for authenticating to database.
         """
         self.parser.add_argument(
-            '-u', action='store', dest='username', help='Database username', required=False, default=None)
+            '-u', '--username', action='store', dest='username', help='Database username', default=None)
         self.parser.add_argument(
-            '-p', action='store', dest='password', help='Database password', required=False, default=None)
+            '-p', '--password', action='store', dest='password', help='Database password', default=None)
         self.parser.add_argument(
-            '-d', action='store', dest='database', help='Database name', default='payroll_management')
+            '-n', '--hostname', action='store', dest='hostname', help='Database hostname', default='localhost')
         self.parser.add_argument(
-            '-n', action='store', dest='hostname', help='Hostname or IP address', default='localhost')
+            '-d', '--database', action='store', dest='database', help='Database name', default='payroll_management')
         self.parser.add_argument(
             '-c', action='store_true', dest='cache', help='Cache credentials', required=False, default=None)
+
+    def __create_interaction_arguments(self):
+        """Create arguments for interacting with the database.
+        """
+        self.parser.add_argument(
+            '-s', '--show', action='store', dest='show', help='Show contents of a table', default=None)
+        self.parser.add_argument(
+            '-a', '--add', action='store', dest='add', help='Add a row to a table', default=None)
+
+    def __create_general_arguments(self):
+        self.parser.add_argument(
+            '-f', '--firstname', action='store', dest='firstname', help='Employee first name', default=None)
+        self.parser.add_argument(
+            '-l', '--lastname', action='store', dest='lastname', help='Employee last name', default=None)
+        self.parser.add_argument(
+            '-N', '--number', action='store', dest='number', help='Phone number', default=None)
+        self.parser.add_argument(
+            '-j', '--job_id', action='store', dest='job_id', help='Employee job ID', default=None)
+        self.parser.add_argument(
+            '-H', '--hire_date', action='store', dest='hire_date', help='Employee hire date', default=datetime.now())
+        self.parser.add_argument(
+            '-L', '--leave_date', action='store', dest='leave_date', help='Employee leave date', default=datetime.now())
 
 
 class Authenticator(object):
@@ -100,10 +127,12 @@ class Authenticator(object):
             message = 'Invalid database name "{}"'.format(connection_kwargs['database'])
             raise AuthenticationError(message)
 
+        print('Successfully connected to {}.{}!'.format(connection_kwargs['host'], connection_kwargs['database']))
         return db_connection
 
 
 if __name__ == '__main__':
     arguments = GlobalArguments()
     auth = Authenticator(arguments)
-    session = auth.authenticate()
+    connection = auth.authenticate()
+    execute(connection, arguments.args)
