@@ -44,18 +44,32 @@ def execute(connection, arguments):
         # Call appropriate functor
         options[arguments.remove](cursor, arguments)
 
+    elif arguments.update is not None:
+        # Dictionary of add functors and associated tables
+        options = {
+            'employee': update_employee,
+            'department': update_department
+        }
+        if arguments.update not in options.keys():
+            msg = '{} is not a valid table'.format(arguments.add)
+            raise InvalidTableNameError(msg)
+
+        # Call appropriate functor
+        options[arguments.update](cursor, arguments)
+
     connection.commit()  # This line saves the changes made to the database
     # Close connection once we're done with it
     cursor.close()
     connection.close()
 
 
-def validate_command(arguments, required=tuple(), valid=tuple()):
+def validate_command(arguments, required=tuple(), valid=tuple(), update=tuple()):
     """Helper function to validate arguments passed to command line fit function being called.
 
     :param arguments: All arguments passed to the command line.
     :param required: List of required arguments for add functionality.
     :param valid: List of valid arguments for remove functionality.
+    :param update: List of valid arguments to update
     """
     arg_dict = vars(arguments)
 
@@ -68,14 +82,23 @@ def validate_command(arguments, required=tuple(), valid=tuple()):
             msg = 'The following arguments are missing: {}'.format(not_met)
             raise RequirementsNotMetError(msg)
 
-    elif len(valid) > 0:
+    if len(valid) > 0:
         total_valid = 0
         for arg in valid:
             if arg_dict[arg] is not None:
                 total_valid += 1
-        if total_valid > 1:
+        if total_valid != 1:
             msg = 'Pleas provide only ONE of the following arguments: {}'.format(valid)
             raise TooManyArguments(msg)
+
+    if len(update) > 0:
+        total_valid_update = 0
+        for arg in update:
+            if arg_dict[arg] is not None:
+                total_valid_update += 1
+        if total_valid_update == 0:
+            msg = 'Pleas provide only ANY of the following arguments: {}'.format(update)
+            raise RequirementsNotMetError(msg)
 
 
 def print_cursor(cursor):
@@ -110,6 +133,68 @@ def select_all(cursor, table_name):
         print(msg)
 
 
+# TODO: clean this crap
+def update_helper(cursor, arguments, valid_arguments, update_arguments, table_name):
+    """Helper function to handle table update commands.
+
+    :param cursor: Cursor for SQL command execution.
+    :param arguments: All arguments passed to program.
+    :param valid_arguments: Tuple of valid column names to run a remove statement on.
+    :param update_arguments: Valid columns in table that may be updated.
+    :param table_name: Table to run remove statement against.
+    """
+    # Make sure one of these arguments were passed to the program
+    validate_command(arguments, valid=valid_arguments, update=update_arguments)
+    all_args = vars(arguments)
+    update_params = list()
+
+    # Select the attribute the user decided to remove an employee by (remove by first_name, last_name, etc.)
+    for arg in update_arguments:
+        if all_args[arg] is not None:
+            update_params.append([arg, vars(arguments)[arg]])
+    print(update_params)
+
+    search_params = dict()
+    for arg in valid_arguments:
+        if all_args[arg] is not None:
+            search_params.update({'attribute': arg, 'value': vars(arguments)[arg]})
+
+    for param in update_params:
+        # arg[4:] will get rid of the set_ part of the string
+        sql = 'UPDATE {} SET {}=? WHERE {} like ?'.format(
+            table_name, param[0][4:], search_params['attribute'])
+        values = (all_args[param[0]], search_params['value'])
+        print(sql)
+        print(values)
+        cursor.execute(sql, values)
+    print('Successfully updated values')
+
+
+def remove_helper(cursor, arguments, valid_arguments, table_name):
+    """Helper function to remove rows from tables.
+
+    :param cursor: Cursor for SQL command execution.
+    :param arguments: All arguments passed to program.
+    :param valid_arguments: Tuple of valid column names to run a remove statement on.
+    :param table_name: Table to run remove statement against.
+    """
+    # Make sure one of these arguments were passed to the program
+    validate_command(arguments, valid=valid_arguments)
+    all_args = vars(arguments)
+    search_params = dict()
+
+    # Select the attribute the user decided to remove an employee by (remove by first_name, last_name, etc.)
+    for arg in valid_arguments:
+        if all_args[arg] is not None:
+            search_params.update({'attribute': arg, 'value': vars(arguments)[arg]})
+    print(search_params)
+
+    sql = 'DELETE FROM {} WHERE {} like ?'.format(table_name, search_params['attribute'])
+    value = (search_params['value'],)
+    cursor.execute(sql, value)
+    print('Successfully removed the values')
+
+
 def add_employee(cursor, arguments):
     """Add an employee to the employee table.
 
@@ -136,29 +221,19 @@ def add_employee(cursor, arguments):
     print('Successfully inserted the values')
 
 
-def remove_helper(cursor, arguments, valid_arguments, table_name):
-    """Helper function to remove rows from tables.
+def update_employee(cursor, arguments):
+    """Update an employee.
+
+    Examples:
+        python main.py --update employee --employee_id 14 --set_fn Joe
+        python main.py --update employee --first_name Bob --set_ln George
 
     :param cursor: Cursor for SQL command execution.
     :param arguments: All arguments passed to program.
-    :param valid_arguments: Tuple of valid column names to run a remove statement on.
-    :param table_name: Table to run remove statement against.
     """
-    # Make sure one of these arguments were passed to the program
-    validate_command(arguments, valid=valid_arguments)
-    all_args = vars(arguments)
-    search_params = dict()
-
-    # Select the attribute the user decided to remove an employee by (remove by first_name, last_name, etc.)
-    for arg in valid_arguments:
-        if all_args[arg] is not None:
-            search_params.update({'attribute': arg, 'value': vars(arguments)[arg]})
-    print(search_params)
-
-    sql = 'DELETE FROM {} WHERE {} like ?'.format(table_name, search_params['attribute'])
-    value = (search_params['value'],)
-    cursor.execute(sql, value)
-    print('Successfully removed the values')
+    valid_arguments = ('first_name', 'last_name', 'number', 'job_id', 'employee_id')
+    update_arguments = ('set_first_name', 'set_last_name', 'set_number', 'set_job_id')
+    update_helper(cursor, arguments, valid_arguments, update_arguments, 'employee')
 
 
 def remove_employee(cursor, arguments):
@@ -197,6 +272,10 @@ def add_department(cursor, arguments):
     print('Successfully added values.')
 
 
+def update_department(cursor, arguments):
+    pass
+
+
 def remove_department(cursor, arguments):
     """Remove a department from department table.
 
@@ -205,7 +284,7 @@ def remove_department(cursor, arguments):
         python main.py -r department -D NewDepartment
 
         python main.py --remove department --department_id 7
-        python main.py -r department -D 7
+        python main.py -r department -i 7
 
     :param cursor: Cursor for SQL command execution.
     :param arguments: All arguments passed to program.

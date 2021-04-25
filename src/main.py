@@ -44,6 +44,18 @@ class GlobalArguments(object):
             '-a', '--add', action='store', dest='add', help='Add a row to a table', default=None)
         self.parser.add_argument(
             '-r', '--remove', action='store', dest='remove', help='Remove a row from a table', default=None)
+        self.parser.add_argument(
+            '-U', '--update', action='store', dest='update', help='Update a row in a table', default=None)
+        self.parser.add_argument(
+            '-S', '--set', action='store', dest='set', help='Change value of item', default=None)
+        self.parser.add_argument(
+            '--set_fn', action='store', dest='set_first_name', help='Set first name', default=None)
+        self.parser.add_argument(
+            '--set_ln', action='store', dest='set_last_name', help='Set last name', default=None)
+        self.parser.add_argument(
+            '--set_number', action='store', dest='set_number', help='Set employee phone number', default=None)
+        self.parser.add_argument(
+            '--set_job_id', action='store', dest='set_job_id', help='Set employee job ID', default=None)
 
     def __create_general_arguments(self):
         """Create general arguments for interacting with the database.
