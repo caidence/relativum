@@ -1,7 +1,32 @@
 # relativum -- Latin (adjective) In relation to
 ------------------------------------------------
+# Table of Contents
+- [General](#general)
+  * [Setup](#setup)
+  * [Getting started](#getting-started)
+  * [Help](#help)
+  * [Showing tables](#showing-tables)
+- [Employee table](#employee)
+  * [Adding an employee](#adding-an-employee)
+  * [Update an employee](#update-an-employee)
+  * [Removing an employee](#removing-an-employee)
+- [Department table](#department)
+  * [Adding a department](#adding-a-department)
+  * [Removing a department](#removing-a-department)
 
-## Getting started
+## General
+----------------------------------
+
+### Setup
+Setup is simple: clone the repository then run the setup script :smile: that's it!
+```bash
+git clone https://github.com/caidence/relativum.git
+python relativum/setup/setup.py
+```
+
+setup.py detects your opperating system and will setup your env accoiringly.
+
+### Getting started
 
 First, let's cache your database credentials. There are two ways:
 
@@ -15,7 +40,15 @@ python main.py --username <your_username> --password <your_password> --cache
 python main.py -c
 ```
 
-## Showing contnets of a table
+### Help
+Get help by typing
+```bash
+# The following commands are equal
+python main.py -h
+python main.py --help
+```
+
+### Showing tables
 
 There are two functions of the --show argument: to show all tables, to show the contents of a specific table.
 
@@ -34,7 +67,10 @@ python main.py --show employee
 python main.py -s department
 ```
 
-## Adding an employee
+## Employee
+------------------------------------
+
+### Adding an employee
 
 There are several ways to add an employee, hopefully the examples make these ways clear. Be sure to pass all
 **Required arguments** for --add employee. They are: --first_name (or -f), --last_name (or -l), --number (or -N), --job_id (or -j)
@@ -45,7 +81,30 @@ python main.py --add employee --first_name Joe --last_name Smith --number 555-55
 python main.py -a employee -f Joe -l Smith -N 555-555-5555 -j 3
 ```
 
-## Removing an employee
+### Update an employee
+
+You can update an existing employee's attributes using the --update command.
+```bash
+# Change employee with ID 14 to have first name "Joe"
+python main.py --update employee --employee_id 14 --set_fn Joe
+```
+
+You don't have to update by employee ID, you can update by names, too.
+```bash
+# Update users with first name "Bob" to have last name "George"
+python main.py --update employee --first_name Bob --set_ln George
+# Same as previous command
+python main.py -u employee -f Bob --set_ln George
+```
+
+Another feature is that you can update as many attributes at a time as you want!
+```bash
+# The following are equal
+python main.py --update employee --employee_id 14 --set_fn Joe --set_ln Smith --set_salary 50000.00
+python main.py -u employee -e 14 --set_fn Joe --set_ln Smith --set_salary 50000.00
+```
+
+### Removing an employee
 
 You can remove an employee using their first name, last name, or employee ID. When removing an employee, make sure you only specify **one** attribute (first name, lastname, or enployee ID). If removing by first name or last name, case does not matter (i.e. Joe is treated the same as jOE)
 ```bash
@@ -62,3 +121,28 @@ python main.py --remove employee --employee_id 12
 python main.py -r employee -e 12
 ```
 **Note:** It is recommended to remove employees by their employee ID since removing by first name or last name will remove **ALL** employees with that name.
+
+## Department
+----------------------------------------
+
+### Adding a department
+
+Adding departments is similar to adding an employee. However, the only **required argument** is --department_name (or -D). Here are some exampes:
+```bash
+# Add department using long and short arguments
+python main.py --add department --department_name NewDepartment
+python main.py -a department -D NewDepartment
+```
+
+### Removing a department
+
+Similarly, you can remove a department by name or ID with the following commands.
+```bash
+# Remove department by name
+python main.py --remove department --department_name NewDepartment
+python main.py -r department -D NewDepartment
+
+# Remove department by ID
+python main.py --remove department --department_id 7
+python main.py -r department -i 7
+```
