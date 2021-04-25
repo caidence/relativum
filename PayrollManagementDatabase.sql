@@ -9,81 +9,104 @@ DROP TABLE IF EXISTS employee;
 DROP TABLE IF EXISTS job;
 DROP TABLE IF EXISTS department;
 
--- CREATE DEPARTMENT TABLE
+
+/*
+    @brief  This table contains department information
+    @param  department_id (primary key) Id of department
+    @param  department_name name of department
+*/
 CREATE TABLE department (
-	Department_ID INTEGER NOT NULL AUTO_INCREMENT,
-    Department_Name VARCHAR(50),
-    PRIMARY KEY (Department_ID)
+	department_id INTEGER NOT NULL AUTO_INCREMENT,
+    department_name VARCHAR(50),
+    PRIMARY KEY (department_id)
 );
-INSERT INTO department VALUES
-(1, 'Administration'),
-(2, 'Sales'),
-(3, 'Accounting'),
-(4, 'Human Resource'),
-(5, 'Customer Service');
+INSERT INTO department (department_name) VALUES
+('Administration'),
+('Sales'),
+('Accounting'),
+('Human Resource'),
+('Customer Service');
 
--- CREATE JOB TABLE
+
+/*
+    @brief  This table contains information about different jobs
+    @param  job_id (primary key) Holds the ID of associated job
+    @param  department_id ID of department, must be in department.department_id
+    @param  job_title Friendly name of job
+*/
 CREATE TABLE job (
-	Job_ID INTEGER NOT NULL AUTO_INCREMENT,
-    Department_ID INTEGER NOT NULL,
-	Job_Title VARCHAR(50),
-    PRIMARY KEY (Job_ID),
-    FOREIGN KEY (Department_ID) References department(Department_ID)
+	job_id INTEGER NOT NULL AUTO_INCREMENT,
+    department_id INTEGER NOT NULL,
+	job_title VARCHAR(50) NOT NULL,
+    PRIMARY KEY (job_id),
+    FOREIGN KEY (department_id) REFERENCES department(department_id)
 );
-INSERT INTO job VALUES
-(1,1,'Regional Manager'),
-(2,2,'Salesman'),
-(3,1,'Receptionist'),
-(4,3,'Senior Accountant'),
-(5,3,'Accountant'),
-(6,5,'Customer Service Representative'),
-(7,4,'Human Resources Representative');
+INSERT INTO job (department_id, job_title) VALUES
+(1, 'Regional Manager'),
+(2, 'Salesman'),
+(1, 'Reception'),
+(3, 'Accountant'),
+(5, 'Customer Service Representative'),
+(4, 'Human Resources Representative');
 
--- CREATE EMPLOYEE TABLE
+
+
+/*
+    @brief  This table keeps track of current employees
+    @param  employee_id (primary key) Unique employee identifier
+    @param  first_name First name of employee
+    @param  last_name Last name of employee
+    @param  phone Employee's company phone number
+    @param  job_id Employee's job id, must be in job.job_id
+*/
 CREATE TABLE employee (
-  Employee_ID INTEGER NOT NULL AUTO_INCREMENT,
-  First_Name varchar(20) NOT NULL,
-  Last_Name varchar(20) NOT NULL,
-  Phone varchar(15) NOT NULL,
-  Job_ID INTEGER DEFAULT NULL,
-  Joining_Date DATE NOT NULL,
-  LeavingDate DATE NULL,
-  PRIMARY KEY (Employee_ID),
-  FOREIGN KEY (Job_ID) REFERENCES job(Job_ID)
+    employee_id INTEGER NOT NULL AUTO_INCREMENT,
+    first_name VARCHAR(20) NOT NULL,
+    last_name VARCHAR(20) NOT NULL,
+    phone VARCHAR(15) NOT NULL,
+    job_id INTEGER NOT NULL,
+    PRIMARY KEY (employee_id),
+    FOREIGN KEY (job_id) REFERENCES job(job_id)
 );
-INSERT INTO employee VALUES
-(1, 'Michael', 'Scott', '123-123-1234',1, '2021-04-19', NULL),
-(2, 'Jim', 'Halpert', '456-456-4567',2,'2021-04-19', NULL),
-(3, 'Dwight', 'Schrute', '717-555-0177',2,'2021-04-19', NULL),
-(4, 'Pam', 'Beesley', '717-333-0177',3,'2021-04-19', NULL),
-(5, 'Angela', 'Martin', '717-333-0177',3,'2021-04-19', NULL),
-(6, 'Stanley', 'Hudson', '717-333-0177',2,'2021-04-19', NULL),
-(7, 'Phyllis', 'Vance', '717-333-0177',2,'2021-04-19', NULL),
-(8, 'Andrew', 'Bernard', '717-333-0177',2,'2021-04-19', NULL),
-(9, 'Kevin', 'Malone', '717-333-0177',5,'2021-04-19', NULL),
-(10, 'Oscar', 'Martinez', '717-333-0177',5,'2021-04-19', NULL),
-(11, 'Kelly', 'Kapoor', '717-333-0177',6,'2021-04-19', NULL),
-(12, 'Toby', 'Flenderson', '717-333-0177',7,'2021-04-19', NULL);
+INSERT INTO employee (first_name, last_name, phone, job_id) VALUES
+('Michael', 'Scott', '123-123-1234', 1),
+('Jim', 'Halpert', '456-456-4567', 2),
+('Dwight', 'Schrute', '717-555-0177', 2),
+('Pam', 'Beesley', '717-333-0177', 3),
+('Angela', 'Martin', '717-333-0177', 4),
+('Stanley', 'Hudson', '717-333-0177', 2),
+('Phyllis', 'Vance', '717-333-0177', 2),
+('Andrew', 'Bernard', '717-333-0177', 2),
+('Kevin', 'Malone', '717-333-0177', 4),
+('Oscar', 'Martinez', '717-333-0177', 4),
+('Kelly', 'Kapoor', '717-333-0177', 5),
+('Toby', 'Flenderson', '717-333-0177', 6);
 
--- CREATE SALARY TABLE
+
+
+/*
+    @brief  This table holds salary information for employees
+    @param  payroll_id (primary key) Employee's payroll id
+    @param  employee_id Employee's id, must be in employee.employee_id
+    @param  gross_salary Employee salary before tax
+*/
 CREATE TABLE salary (
-	Salary_ID INTEGER NOT NULL AUTO_INCREMENT,
-    Employee_ID INTEGER NOT NULL,
-    State_Tax DECIMAL (4,4) NOT NULL,
-    Gross_Salary NUMERIC(12,2) NOT NULL,
-    Net_Salary NUMERIC(12,2) NOT NULL,
-    PRIMARY KEY (Salary_ID),
-    FOREIGN KEY (Employee_ID) REFERENCES employee(Employee_ID)
+    payroll_id INTEGER NOT NULL AUTO_INCREMENT,
+    employee_id INTEGER NOT NULL,
+    gross_salary NUMERIC(12, 2) NOT NULL,
+    PRIMARY KEY (payroll_id),
+    FOREIGN KEY (employee_id) REFERENCES employee(employee_id)
 );
-INSERT INTO salary VALUES
-(1,1,0.0307,60000.00,58158.00),
-(2,2,0.0307,48000.00,46526.40),
-(3,3,0.0307,48000.00,46526.40),
-(4,4,0.0307,35000.00,33925.50),
-(5,5,0.0307,57000.00,55250.10),
-(6,6,0.0307,48000.00,46526.40),
-(7,7,0.0307,48000.00,46526.40),
-(8,8,0.0307,48000.00,46526.40),
-(9,9,0.0307,50000.00,48465.00),
-(10,10,0.0307,50000.00,48465.00),
-(12,12,0.0307,58800.00,56994.84);
+INSERT INTO salary (employee_id, gross_salary) VALUES
+(1, 60000.00),
+(2, 48000.00),
+(3, 48000.00),
+(4, 35000.00),
+(5, 57000.00),
+(6, 48000.00),
+(7, 48000.00),
+(8, 48000.00),
+(9, 50000.00),
+(10, 50000.00),
+(11, 51000.00),
+(12, 58800.00);

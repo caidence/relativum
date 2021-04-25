@@ -48,17 +48,13 @@ class GlobalArguments(object):
 
     def __create_general_arguments(self):
         self.parser.add_argument(
-            '-f', '--firstname', action='store', dest='firstname', help='Employee first name', default=None)
+            '-f', '--first_name', action='store', dest='first_name', help='Employee first name', default=None)
         self.parser.add_argument(
-            '-l', '--lastname', action='store', dest='lastname', help='Employee last name', default=None)
+            '-l', '--last_name', action='store', dest='last_name', help='Employee last name', default=None)
         self.parser.add_argument(
             '-N', '--number', action='store', dest='number', help='Phone number', default=None)
         self.parser.add_argument(
             '-j', '--job_id', action='store', dest='job_id', help='Employee job ID', default=None)
-        self.parser.add_argument(
-            '-H', '--hire_date', action='store', dest='hire_date', help='Employee hire date', default=datetime.now())
-        self.parser.add_argument(
-            '-L', '--leave_date', action='store', dest='leave_date', help='Employee leave date', default=datetime.now())
 
 
 class Authenticator(object):

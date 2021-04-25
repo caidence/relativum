@@ -1,11 +1,4 @@
 import mariadb
-import enum
-
-
-class TablesName(enum.Enum):
-    """Payroll management table names
-    """
-    employee = 'employee'
 
 
 class InvalidTableNameError(Exception):
@@ -24,9 +17,10 @@ def execute(connection, arguments):
     :param connection: Database connection to run queries on
     :param arguments: Arguments passed to this program
     """
+    cursor = connection.cursor()
 
     if arguments.show is not None:
-        select_all(connection, arguments.show)
+        select_all(cursor, arguments.show)
 
     elif arguments.add is not None:
         # Dictionary of add functors and associated tables
@@ -38,9 +32,11 @@ def execute(connection, arguments):
             raise InvalidTableNameError(msg)
 
         # Call appropriate functor
-        options[arguments.add](connection, arguments)
+        options[arguments.add](cursor, arguments)
 
+    connection.commit()  # This line saves the changes made to the database
     # Close connection once we're done with it
+    cursor.close()
     connection.close()
 
 
@@ -72,17 +68,16 @@ def validate_command(arguments, required: list[str]):
         raise RequirementsNotMetError(msg)
 
 
-def select_all(connection, table_name):
+def select_all(cursor, table_name):
     """Show all tables or contents of a specific table
 
     Example:
         python main.py --show tables
         python main.py --show department
 
-    :param connection: Connection to mariadb
+    :param cursor: cursor to mariadb
     :param table_name: Name of table to display
     """
-    cursor = connection.cursor()
 
     try:
         # Show tables
@@ -95,36 +90,23 @@ def select_all(connection, table_name):
     except mariadb.ProgrammingError:
         msg = '{} is not a valid table name'.format(table_name)
         print(msg)
-    finally:
-        cursor.close()
 
 
-def add_employee(connection, arguments):
-    required_args = ['firstname', 'lastname', 'number', 'job_id', 'hire_date']
+def add_employee(cursor, arguments):
+    required_args = ['first_name', 'last_name', 'number', 'job_id']
     validate_command(arguments, required_args)
 
-    cursor = connection.cursor()
-    table_name = TablesName.employee.value
-
-    try:
-        sql = f'INSERT INTO {table_name} ' \
-              f'(First_Name, Last_Name, Phone, Job_ID, Joining_Date, LeavingDate) ' \
-              f'VALUES (?, ?, ?, ?, ?, ?)'
-        values = (
-            arguments.firstname,
-            arguments.lastname,
-            arguments.number,
-            arguments.job_id,
-            arguments.hire_date,
-            None  # Leave date will be NULL since we're adding an employee
-        )
-        cursor.execute(sql, values)
-        for x in cursor:
-            print(x)
-    finally:
-        cursor.close()
+    sql = 'INSERT INTO employee (first_name, last_name, phone, job_id) VALUES (?, ?, ?, ?)'
+    values = (
+        arguments.first_name,
+        arguments.last_name,
+        arguments.number,
+        int(arguments.job_id)
+    )
+    print(values)
+    cursor.execute(sql, values)
 
 
-def remove_employee(connection, arguments):
+def remove_employee(cursor, arguments):
     pass
 
