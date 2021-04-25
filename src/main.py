@@ -1,9 +1,13 @@
+# Python imports
 import argparse
-import mariadb
 import json
 import os
 from getpass import getpass
 
+# Third-party imports
+import mariadb
+
+# Local imports
 from model import execute
 from error import AuthenticationError
 

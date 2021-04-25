@@ -137,6 +137,13 @@ def add_employee(cursor, arguments):
 
 
 def remove_helper(cursor, arguments, valid_arguments, table_name):
+    """Helper function to remove rows from tables.
+
+    :param cursor: Cursor for SQL command execution.
+    :param arguments: All arguments passed to program.
+    :param valid_arguments: Tuple of valid column names to run a remove statement on.
+    :param table_name: Table to run remove statement against.
+    """
     # Make sure one of these arguments were passed to the program
     validate_command(arguments, valid=valid_arguments)
     all_args = vars(arguments)
@@ -165,13 +172,21 @@ def remove_employee(cursor, arguments):
 
     :param cursor: Cursor for SQL command execution.
     :param arguments: All arguments passed to program.
-    :return:
     """
     valid_args = ('first_name', 'last_name', 'employee_id')
     remove_helper(cursor, arguments, valid_args, 'employee')
 
 
 def add_department(cursor, arguments):
+    """Add a department to the department table.
+
+    Examples:
+        python main.py --add department --department_name NewDepartment
+        python main.py -a department -D NewDepartment
+
+    :param cursor: Cursor for SQL command execution.
+    :param arguments: All arguments passed to program.
+    """
     required_args = ('department_name',)
     validate_command(arguments, required=required_args)
 
@@ -183,5 +198,17 @@ def add_department(cursor, arguments):
 
 
 def remove_department(cursor, arguments):
+    """Remove a department from department table.
+
+    Exampes:
+        python main.py --remove department --department_name NewDepartment
+        python main.py -r department -D NewDepartment
+
+        python main.py --remove department --department_id 7
+        python main.py -r department -D 7
+
+    :param cursor: Cursor for SQL command execution.
+    :param arguments: All arguments passed to program.
+    """
     valid_args = ('department_id', 'department_name')
     remove_helper(cursor, arguments, valid_args, 'department')
