@@ -2,7 +2,8 @@ import mariadb
 
 from error import (
     InvalidTableNameError,
-    RequirementsNotMetError
+    RequirementsNotMetError,
+    TooManyArguments
 )
 
 
@@ -29,44 +30,64 @@ def execute(connection, arguments):
         # Call appropriate functor
         options[arguments.add](cursor, arguments)
 
+    elif arguments.remove is not None:
+        # Dictionary of add functors and associated tables
+        options = {
+            'employee': remove_employee
+        }
+        if arguments.remove not in options.keys():
+            msg = '{} is not a valid table'.format(arguments.add)
+            raise InvalidTableNameError(msg)
+
+        # Call appropriate functor
+        options[arguments.remove](cursor, arguments)
+
     connection.commit()  # This line saves the changes made to the database
     # Close connection once we're done with it
     cursor.close()
     connection.close()
 
 
+def validate_command(arguments, required=tuple(), valid=tuple()):
+    """Helper function to validate arguments passed to command line fit function being called.
+
+    :param arguments: All arguments passed to the command line.
+    :param required: List of required arguments for add functionality.
+    :param valid: List of valid arguments for remove functionality.
+    """
+    arg_dict = vars(arguments)
+
+    if len(required) > 0:
+        not_met = list()
+        for requirement in required:
+            if arg_dict[requirement] is None:
+                not_met.append(requirement)
+        if len(not_met) != 0:
+            msg = 'The following arguments are missing: {}'.format(not_met)
+            raise RequirementsNotMetError(msg)
+
+    elif len(valid) > 0:
+        total_valid = 0
+        for arg in valid:
+            if arg_dict[arg] is not None:
+                total_valid += 1
+        if total_valid > 1:
+            msg = 'Pleas provide only ONE of the following arguments: {}'.format(valid)
+            raise TooManyArguments(msg)
+
+
 def print_cursor(cursor):
     """Helper function to print results of a cursor
-
     :param cursor: Cursor iterator returned by calling cursor.execute()
     """
     for row in cursor:
         print(row)
 
 
-def validate_command(arguments, required: list[str]):
-    """Helper function to validate arguments passed to command line fit function being called.
-
-    :param arguments: All arguments passed to the command line.
-    :param required: List of required arguments.
-    :return:
-    """
-    arg_dict = vars(arguments)
-    print(arg_dict)
-
-    not_met = list()
-    for requirement in required:
-        if arg_dict[requirement] is None:
-            not_met.append(requirement)
-    if len(not_met) != 0:
-        msg = 'The following arguments are missing: {}'.format(not_met)
-        raise RequirementsNotMetError(msg)
-
-
 def select_all(cursor, table_name):
     """Show all tables or contents of a specific table
 
-    Example:
+    Examples:
         python main.py --show tables
         python main.py --show department
 
@@ -88,8 +109,18 @@ def select_all(cursor, table_name):
 
 
 def add_employee(cursor, arguments):
-    required_args = ['first_name', 'last_name', 'number', 'job_id']
-    validate_command(arguments, required_args)
+    """Add an employee to the employee table.
+
+    Examples:
+        python main.py --add employee -f Joe -l Smith -N 555-555-5555 -j 3
+        python main.py --add employee --first_name Joe --last_name Smith --number 555-555-5555 --job_id 3
+
+    :param cursor: Cursor for SQL command execution.
+    :param arguments: All arguments passed to program.
+    """
+    # Make sure all of these arguments were passed to the program
+    required_args = ('first_name', 'last_name', 'number', 'job_id')
+    validate_command(arguments, required=required_args)
 
     sql = 'INSERT INTO employee (first_name, last_name, phone, job_id) VALUES (?, ?, ?, ?)'
     values = (
@@ -100,8 +131,35 @@ def add_employee(cursor, arguments):
     )
     print(values)
     cursor.execute(sql, values)
+    print('Successfully inserted the values')
 
 
 def remove_employee(cursor, arguments):
-    pass
+    """Remove an employee from the employee table.
 
+    Examples:
+        python main.py --remove employee --first_name Joe
+        python main.py -r employee --last_name smith
+        python main.py -r employee --employee_id 7
+        python main.py -r employee -e 7
+
+    :param cursor: Cursor for SQL command execution.
+    :param arguments: All arguments passed to program.
+    :return:
+    """
+    # Make sure one of these arguments were passed to the program
+    valid_args = ('first_name', 'last_name', 'employee_id')
+    validate_command(arguments, valid=valid_args)
+    all_args = vars(arguments)
+    search_params = dict()
+
+    # Select the attribute the user decided to remove an employee by (remove by first_name, last_name, etc.)
+    for arg in valid_args:
+        if all_args[arg] is not None:
+            search_params.update({'attribute': arg, 'value': vars(arguments)[arg]})
+    print(search_params)
+
+    sql = 'DELETE FROM employee WHERE {} like ?'.format(search_params['attribute'])
+    value = (search_params['value'],)
+    cursor.execute(sql, value)
+    print('Successfully removed the values')

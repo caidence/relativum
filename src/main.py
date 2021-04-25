@@ -38,8 +38,12 @@ class GlobalArguments(object):
             '-s', '--show', action='store', dest='show', help='Show contents of a table', default=None)
         self.parser.add_argument(
             '-a', '--add', action='store', dest='add', help='Add a row to a table', default=None)
+        self.parser.add_argument(
+            '-r', '--remove', action='store', dest='remove', help='Remove a row from a table', default=None)
 
     def __create_general_arguments(self):
+        """Create general arguments for interacting with the database.
+        """
         self.parser.add_argument(
             '-f', '--first_name', action='store', dest='first_name', help='Employee first name', default=None)
         self.parser.add_argument(
@@ -48,6 +52,8 @@ class GlobalArguments(object):
             '-N', '--number', action='store', dest='number', help='Phone number', default=None)
         self.parser.add_argument(
             '-j', '--job_id', action='store', dest='job_id', help='Employee job ID', default=None)
+        self.parser.add_argument(
+            '-e', '--employee_id', action='store', dest='employee_id', help='Employee ID', default=None)
 
 
 class Authenticator(object):
@@ -121,7 +127,7 @@ class Authenticator(object):
 
 
 if __name__ == '__main__':
-    arguments = GlobalArguments()
-    auth = Authenticator(arguments)
-    connection = auth.authenticate()
-    execute(connection, arguments.args)
+    arguments = GlobalArguments()  # We need to pass these to execution
+    auth = Authenticator(arguments)  # Authenticate to the database
+    connection = auth.authenticate()  # Open a connection to the database
+    execute(connection, arguments.args)  # Sterilize and process the user arguments
