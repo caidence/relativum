@@ -273,7 +273,18 @@ def add_department(cursor, arguments):
 
 
 def update_department(cursor, arguments):
-    pass
+    """Update a department.
+
+        Examples:
+            python main.py --update department --department_id 3 --set_name NewName
+            python main.py -u department -i 3 --set_name NewName
+
+        :param cursor: Cursor for SQL command execution.
+        :param arguments: All arguments passed to program.
+        """
+    valid_arguments = ('department_name', 'department_id')
+    update_arguments = ('set_department_name',)
+    update_helper(cursor, arguments, valid_arguments, update_arguments, 'department')
 
 
 def remove_department(cursor, arguments):

@@ -56,6 +56,8 @@ class GlobalArguments(object):
             '--set_number', action='store', dest='set_number', help='Set employee phone number', default=None)
         self.parser.add_argument(
             '--set_job_id', action='store', dest='set_job_id', help='Set employee job ID', default=None)
+        self.parser.add_argument(
+            '--set_name', action='store', dest='set_department_name', help='Set department name', default=None)
 
     def __create_general_arguments(self):
         """Create general arguments for interacting with the database.
