@@ -31,21 +31,12 @@ def execute(connection, arguments):
             'update': update_job}
     }
 
-    # Quick table validation
-    for arg in (arguments.add, arguments.remove, arguments.update):
-        if arg is not None and arg not in functors.keys():
-            msg = '{} is not a valid table name'.format(arg)
-            raise InvalidTableNameError(msg)
-
     if arguments.show is not None:
         select_all(cursor, arguments.show)
-
     elif arguments.add is not None:
         functors[arguments.add]['add'](cursor, arguments)  # Call appropriate add functor
-
     elif arguments.remove is not None:
         functors[arguments.remove]['remove'](cursor, arguments)  # Call appropriate remove functor
-
     elif arguments.update is not None:
         functors[arguments.update]['update'](cursor, arguments)  # Call appropriate update functor
 
@@ -226,7 +217,7 @@ def update_employee(cursor, arguments):
     :param arguments: All arguments passed to program.
     """
     valid_arguments = ('first_name', 'last_name', 'number', 'job_id', 'employee_id')
-    update_arguments = ('set_first_name', 'set_last_name', 'set_number', 'set_job_id')
+    update_arguments = ('set_first_name', 'set_last_name', 'set_phone', 'set_job_id')
     update_helper(cursor, arguments, valid_arguments, update_arguments, 'employee')
 
 
