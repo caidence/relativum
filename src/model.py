@@ -15,51 +15,39 @@ def execute(connection, arguments):
     """
     cursor = connection.cursor()
 
+    # Simulates vector of unordered maps of function pointers
+    functors = {
+        'employee': {
+            'add': add_employee,
+            'remove': remove_employee,
+            'update': update_employee},
+        'department': {
+            'add': add_department,
+            'remove': remove_department,
+            'update': update_department},
+        'job': {
+            'add': add_job,
+            'remove': remove_job,
+            'update': update_job}
+    }
+
+    # Quick table validation
+    for arg in (arguments.add, arguments.remove, arguments.update):
+        if arg is not None and arg not in functors.keys():
+            msg = '{} is not a valid table name'.format(arg)
+            raise InvalidTableNameError(msg)
+
     if arguments.show is not None:
         select_all(cursor, arguments.show)
 
-    # TODO: One dictionary of tuples?
     elif arguments.add is not None:
-        # Dictionary of add functors and associated tables
-        options = {
-            'employee': add_employee,
-            'department': add_department,
-            'job': add_job
-        }
-        if arguments.add not in options.keys():
-            msg = '{} is not a valid table'.format(arguments.add)
-            raise InvalidTableNameError(msg)
-
-        # Call appropriate functor
-        options[arguments.add](cursor, arguments)
+        functors[arguments.add]['add'](cursor, arguments)  # Call appropriate add functor
 
     elif arguments.remove is not None:
-        # Dictionary of add functors and associated tables
-        options = {
-            'employee': remove_employee,
-            'department': remove_department,
-            'job': remove_job
-        }
-        if arguments.remove not in options.keys():
-            msg = '{} is not a valid table'.format(arguments.add)
-            raise InvalidTableNameError(msg)
-
-        # Call appropriate functor
-        options[arguments.remove](cursor, arguments)
+        functors[arguments.remove]['remove'](cursor, arguments)  # Call appropriate remove functor
 
     elif arguments.update is not None:
-        # Dictionary of add functors and associated tables
-        options = {
-            'employee': update_employee,
-            'department': update_department,
-            'job': update_job
-        }
-        if arguments.update not in options.keys():
-            msg = '{} is not a valid table'.format(arguments.add)
-            raise InvalidTableNameError(msg)
-
-        # Call appropriate functor
-        options[arguments.update](cursor, arguments)
+        functors[arguments.update]['update'](cursor, arguments)  # Call appropriate update functor
 
     connection.commit()  # This line saves the changes made to the database
     # Close connection once we're done with it
