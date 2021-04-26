@@ -12,6 +12,7 @@
   * [Removing an employee](#removing-an-employee)
 - [Department table](#department)
   * [Adding a department](#adding-a-department)
+  * [Update a department](#update-a-department)
   * [Removing a department](#removing-a-department)
 
 ## General
@@ -110,11 +111,11 @@ You can remove an employee using their first name, last name, or employee ID. Wh
 ```bash
 # Remove employee by first name (both do the same thing)
 python main.py --remove employee --first_name Joe
-python main.py -r -f Joe
+python main.py -r employee -f Joe
 
 # Remove employee by last name (both do the same thing)
 python main.py --remove employee --last_name Smith
-python main.py -r -l Smith
+python main.py -r employee -l Smith
 
 # Remove employee by ID
 python main.py --remove employee --employee_id 12
@@ -132,6 +133,15 @@ Adding departments is similar to adding an employee. However, the only **require
 # Add department using long and short arguments
 python main.py --add department --department_name NewDepartment
 python main.py -a department -D NewDepartment
+```
+
+### Update a department
+
+Updating a department is similar to updaing an employee. The only attribute of departments that can be updated is their name.
+```bash
+# Both commands update the name of department with ID of 3 to "NewName"
+python main.py --update department --department_id 3 --set_name NewName
+python main.py -u department -i 3 --set_name NewName
 ```
 
 ### Removing a department

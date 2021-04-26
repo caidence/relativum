@@ -16,7 +16,7 @@ DROP TABLE IF EXISTS department;
     @param  department_name name of department
 */
 CREATE TABLE department (
-	department_id INTEGER NOT NULL AUTO_INCREMENT,
+    department_id INTEGER NOT NULL AUTO_INCREMENT,
     department_name VARCHAR(50),
     PRIMARY KEY (department_id)
 );
@@ -35,9 +35,9 @@ INSERT INTO department (department_name) VALUES
     @param  job_title Friendly name of job
 */
 CREATE TABLE job (
-	job_id INTEGER NOT NULL AUTO_INCREMENT,
+    job_id INTEGER NOT NULL AUTO_INCREMENT,
     department_id INTEGER NOT NULL,
-	job_title VARCHAR(50) NOT NULL,
+    job_title VARCHAR(50) NOT NULL,
     PRIMARY KEY (job_id),
     FOREIGN KEY (department_id) REFERENCES department(department_id)
 );
