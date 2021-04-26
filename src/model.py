@@ -18,11 +18,13 @@ def execute(connection, arguments):
     if arguments.show is not None:
         select_all(cursor, arguments.show)
 
+    # TODO: One dictionary of tuples?
     elif arguments.add is not None:
         # Dictionary of add functors and associated tables
         options = {
             'employee': add_employee,
-            'department': add_department
+            'department': add_department,
+            'job': add_job
         }
         if arguments.add not in options.keys():
             msg = '{} is not a valid table'.format(arguments.add)
@@ -35,7 +37,8 @@ def execute(connection, arguments):
         # Dictionary of add functors and associated tables
         options = {
             'employee': remove_employee,
-            'department': remove_department
+            'department': remove_department,
+            'job': remove_job
         }
         if arguments.remove not in options.keys():
             msg = '{} is not a valid table'.format(arguments.add)
@@ -48,7 +51,8 @@ def execute(connection, arguments):
         # Dictionary of add functors and associated tables
         options = {
             'employee': update_employee,
-            'department': update_department
+            'department': update_department,
+            'job': update_job
         }
         if arguments.update not in options.keys():
             msg = '{} is not a valid table'.format(arguments.add)
@@ -63,6 +67,7 @@ def execute(connection, arguments):
     connection.close()
 
 
+# TODO: simplify this
 def validate_command(arguments, required=tuple(), valid=tuple(), update=tuple()):
     """Helper function to validate arguments passed to command line fit function being called.
 
@@ -101,6 +106,7 @@ def validate_command(arguments, required=tuple(), valid=tuple(), update=tuple())
             raise RequirementsNotMetError(msg)
 
 
+# TODO: make print more descriptive
 def print_cursor(cursor):
     """Helper function to print results of a cursor
     :param cursor: Cursor iterator returned by calling cursor.execute()
@@ -302,3 +308,58 @@ def remove_department(cursor, arguments):
     """
     valid_args = ('department_id', 'department_name')
     remove_helper(cursor, arguments, valid_args, 'department')
+
+
+def add_job(cursor, arguments):
+    """Add a job to the job table.
+
+    Examples:
+        python main.py --add job --job_title NewJob --department_id 5
+        python main.py -a job -t NewJob -i 5
+
+    :param cursor: Cursor for SQL command execution.
+    :param arguments: All arguments passed to program.
+    """
+    required_args = ('department_id', 'job_title')
+    validate_command(arguments, required_args)
+
+    sql = 'INSERT INTO job (department_id, job_title) VALUES (?, ?)'
+    values = (
+        arguments.department_id,
+        arguments.job_title,
+    )
+    print(values)
+    cursor.execute(sql, values)
+    print('Successfully inserted the values')
+
+
+def update_job(cursor, arguments):
+    """Update a job.
+
+        Examples:
+            python main.py --update job --job_title sales --set_department_id 5
+            python main.py -u job -t sales --set_department_id 5
+
+        :param cursor: Cursor for SQL command execution.
+        :param arguments: All arguments passed to program.
+        """
+    valid_arguments = ('job_title', 'job_id')
+    update_arguments = ('set_job_title', 'set_department_id')
+    update_helper(cursor, arguments, valid_arguments, update_arguments, 'job')
+
+
+def remove_job(cursor, arguments):
+    """Remove a job from job table.
+
+    Exampes:
+        python main.py --remove job --job_id 7
+        python main.py -r job -j 7
+
+        python main.py --remove job --job_title sales
+        python main.py -r job -t sales
+
+    :param cursor: Cursor for SQL command execution.
+    :param arguments: All arguments passed to program.
+    """
+    valid_args = ('job_title', 'job_id')
+    remove_helper(cursor, arguments, valid_args, 'job')

@@ -58,6 +58,10 @@ class GlobalArguments(object):
             '--set_job_id', action='store', dest='set_job_id', help='Set employee job ID', default=None)
         self.parser.add_argument(
             '--set_name', action='store', dest='set_department_name', help='Set department name', default=None)
+        self.parser.add_argument(
+            '--set_title', action='store', dest='set_job_title', help='Set job title', default=None)
+        self.parser.add_argument(
+            '--set_department_id', action='store', dest='set_department_id', help='Set department ID', default=None)
 
     def __create_general_arguments(self):
         """Create general arguments for interacting with the database.
@@ -76,6 +80,8 @@ class GlobalArguments(object):
             '-D', '--department_name', action='store', dest='department_name', help='Department name', default=None)
         self.parser.add_argument(
             '-i', '--department_id', action='store', dest='department_id', help='Department ID', default=None)
+        self.parser.add_argument(
+            '-t', '--job_title', action='store', dest='job_title', help='Job title', default=None)
 
 
 class Authenticator(object):
