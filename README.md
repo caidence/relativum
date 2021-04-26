@@ -8,12 +8,16 @@
   * [Showing tables](#showing-tables)
 - [Employee table](#employee)
   * [Adding an employee](#adding-an-employee)
-  * [Update an employee](#update-an-employee)
+  * [Updating an employee](#updating-an-employee)
   * [Removing an employee](#removing-an-employee)
 - [Department table](#department)
   * [Adding a department](#adding-a-department)
-  * [Update a department](#update-a-department)
+  * [Updating a department](#updating-a-department)
   * [Removing a department](#removing-a-department)
+- [Job table](#job)
+  * [Adding a job](#adding-a-department)
+  * [Updating a job](#updating-a-department)
+  * [Removing a job](#removing-a-department)
 
 ## General
 ----------------------------------
@@ -82,7 +86,7 @@ python main.py --add employee --first_name Joe --last_name Smith --number 555-55
 python main.py -a employee -f Joe -l Smith -N 555-555-5555 -j 3
 ```
 
-### Update an employee
+### Updating an employee
 
 You can update an existing employee's attributes using the --update command.
 ```bash
@@ -135,7 +139,7 @@ python main.py --add department --department_name NewDepartment
 python main.py -a department -D NewDepartment
 ```
 
-### Update a department
+### Updating a department
 
 Updating a department is similar to updaing an employee. The only attribute of departments that can be updated is their name.
 ```bash
@@ -156,3 +160,36 @@ python main.py -r department -D NewDepartment
 python main.py --remove department --department_id 7
 python main.py -r department -i 7
 ```
+
+
+## Job
+-----------------------------------
+
+### Adding a job
+Adding a job is like adding rows to other tables, the required arguments are --job_title (or -t) and --department_id (or -i) here are some quick examples.
+```bash
+# Both commands are the same
+python main.py --add job --job_title NewJob --department_id 5
+python main.py -a job -t NewJob -i 5
+```
+
+### Updating a job
+Two row attributes can be updated for the job; namely, department_id and job_title. These can be modified by specifing the --set_department_id and --set_title flags respectively.
+```bash
+# Update job with job title "Sales" to have department ID 5
+python main.py --update job --job_title sales --set_department_id 5
+python main.py -u job -t sales --set_department_id 5
+```
+
+### Removing a job
+Similarly, removing a job is the same as removing rows from other tables. To remove a job you must specify either --job_id (or -j) or --job_title (or -t). You **cannot** remove a job by department ID since many jobs may have the same department.
+```bash
+# Remove job with ID 7
+python main.py --remove job --job_id 7
+python main.py -r job -j 7
+
+# Remove job where title is "Sales"
+python main.py --remove job --job_title sales
+python main.py -r job -t sales
+```
+**Note:** When removing a job by title, the title is case-insensitive. That is, "sales" is the same as "sAlEs."
