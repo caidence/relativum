@@ -1,10 +1,6 @@
 import mariadb
 
-from error import (
-    InvalidTableNameError,
-    RequirementsNotMetError,
-    TooManyArguments
-)
+from error import RequirementsNotMetError
 
 
 def execute(connection, arguments):
@@ -46,41 +42,34 @@ def execute(connection, arguments):
     connection.close()
 
 
-# TODO: simplify this
 def validate_command(arguments, required=tuple(), valid=tuple(), update=tuple()):
     """Helper function to validate arguments passed to command line fit function being called.
 
     :param arguments: All arguments passed to the command line.
     :param required: List of required arguments for add functionality.
     :param valid: List of valid arguments for remove functionality.
-    :param update: List of valid arguments to update
+    :param update: List of updatable arguments for update functionality.
     """
-    arg_dict = vars(arguments)
+    global_argument_dict = vars(arguments)
 
+    # For insert statements
     if len(required) > 0:
-        not_met = list()
-        for requirement in required:
-            if arg_dict[requirement] is None:
-                not_met.append(requirement)
-        if len(not_met) != 0:
-            msg = 'The following arguments are missing: {}'.format(not_met)
+        requirements_not_met = [arg for arg in required if global_argument_dict[arg] is None]
+        if len(requirements_not_met) != 0:
+            msg = 'The following arguments are missing: {}'.format(requirements_not_met)
             raise RequirementsNotMetError(msg)
 
+    # For remove functionality
     if len(valid) > 0:
-        total_valid = 0
-        for arg in valid:
-            if arg_dict[arg] is not None:
-                total_valid += 1
-        if total_valid != 1:
-            msg = 'Pleas provide only ONE of the following arguments: {}'.format(valid)
-            raise TooManyArguments(msg)
+        valid_not_used = [arg for arg in valid if global_argument_dict[arg] is not None]
+        if len(valid_not_used) == 0:
+            msg = 'Pleas provide only ANY of the following arguments: {}'.format(valid)
+            raise RequirementsNotMetError(msg)
 
+    # For update functionality
     if len(update) > 0:
-        total_valid_update = 0
-        for arg in update:
-            if arg_dict[arg] is not None:
-                total_valid_update += 1
-        if total_valid_update == 0:
+        total_valid_update = [arg for arg in update if global_argument_dict[arg] is not None]
+        if len(total_valid_update) == 0:
             msg = 'Pleas provide only ANY of the following arguments: {}'.format(update)
             raise RequirementsNotMetError(msg)
 

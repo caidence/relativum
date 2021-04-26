@@ -73,7 +73,7 @@ class GlobalArguments(object):
         self.parser.add_argument(
             '-l', '--last_name', action='store', dest='last_name', help='Employee last name', default=None)
         self.parser.add_argument(
-            '-N', '--number', action='store', dest='number', help='Phone number', default=None)
+            '-N', '--phone', action='store', dest='number', help='Phone number', default=None)
         self.parser.add_argument(
             '-j', '--job_id', action='store', dest='job_id', help='Employee job ID', default=None)
         self.parser.add_argument(
