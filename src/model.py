@@ -1,6 +1,9 @@
-import mariadb
-
-from error import RequirementsNotMetError
+# Local imports
+from helper import (
+    add_helper,
+    update_helper,
+    remove_helper
+)
 
 
 def execute(connection, arguments):
@@ -27,146 +30,20 @@ def execute(connection, arguments):
             'update': update_job}
     }
 
+    # Call the appropriate functor object
     if arguments.show is not None:
         select_all(cursor, arguments.show)
     elif arguments.add is not None:
-        functors[arguments.add]['add'](cursor, arguments)  # Call appropriate add functor
+        functors[arguments.add]['add'](cursor, arguments)
     elif arguments.remove is not None:
-        functors[arguments.remove]['remove'](cursor, arguments)  # Call appropriate remove functor
+        functors[arguments.remove]['remove'](cursor, arguments)
     elif arguments.update is not None:
-        functors[arguments.update]['update'](cursor, arguments)  # Call appropriate update functor
+        functors[arguments.update]['update'](cursor, arguments)
 
     connection.commit()  # This line saves the changes made to the database
     # Close connection once we're done with it
     cursor.close()
     connection.close()
-
-
-def validate_command(arguments, required=tuple(), valid=tuple(), update=tuple()):
-    """Helper function to validate arguments passed to command line fit function being called.
-
-    :param arguments: All arguments passed to the command line.
-    :param required: List of required arguments for add functionality.
-    :param valid: List of valid arguments for remove functionality.
-    :param update: List of updatable arguments for update functionality.
-    """
-    global_argument_dict = vars(arguments)
-
-    # For insert statements
-    if len(required) > 0:
-        requirements_not_met = [arg for arg in required if global_argument_dict[arg] is None]
-        if len(requirements_not_met) != 0:
-            msg = 'The following arguments are missing: {}'.format(requirements_not_met)
-            raise RequirementsNotMetError(msg)
-
-    # For remove functionality
-    if len(valid) > 0:
-        valid_not_used = [arg for arg in valid if global_argument_dict[arg] is not None]
-        if len(valid_not_used) == 0:
-            msg = 'Pleas provide only ANY of the following arguments: {}'.format(valid)
-            raise RequirementsNotMetError(msg)
-
-    # For update functionality
-    if len(update) > 0:
-        total_valid_update = [arg for arg in update if global_argument_dict[arg] is not None]
-        if len(total_valid_update) == 0:
-            msg = 'Pleas provide only ANY of the following arguments: {}'.format(update)
-            raise RequirementsNotMetError(msg)
-
-
-# TODO: make print more descriptive
-def print_cursor(cursor):
-    """Helper function to print results of a cursor
-    :param cursor: Cursor iterator returned by calling cursor.execute()
-    """
-    for row in cursor:
-        print(row)
-
-
-def select_all(cursor, table_name):
-    """Show all tables or contents of a specific table
-
-    Examples:
-        python main.py --show tables
-        python main.py --show department
-
-    :param cursor: cursor to mariadb
-    :param table_name: Name of table to display
-    """
-
-    try:
-        # Show tables
-        if table_name == 'tables':
-            cursor.execute('SHOW tables')
-        # Show contents of specific tables
-        else:
-            cursor.execute(f'SELECT * from {table_name}')
-        print_cursor(cursor)
-    except mariadb.ProgrammingError:
-        msg = '{} is not a valid table name'.format(table_name)
-        print(msg)
-
-
-# TODO: clean this crap
-def update_helper(cursor, arguments, valid_arguments, update_arguments, table_name):
-    """Helper function to handle table update commands.
-
-    :param cursor: Cursor for SQL command execution.
-    :param arguments: All arguments passed to program.
-    :param valid_arguments: Tuple of valid column names to run a remove statement on.
-    :param update_arguments: Valid columns in table that may be updated.
-    :param table_name: Table to run remove statement against.
-    """
-    # Make sure one of these arguments were passed to the program
-    validate_command(arguments, valid=valid_arguments, update=update_arguments)
-    all_args = vars(arguments)
-    update_params = list()
-
-    # Select the attribute the user decided to remove an employee by (remove by first_name, last_name, etc.)
-    for arg in update_arguments:
-        if all_args[arg] is not None:
-            update_params.append([arg, vars(arguments)[arg]])
-    print(update_params)
-
-    search_params = dict()
-    for arg in valid_arguments:
-        if all_args[arg] is not None:
-            search_params.update({'attribute': arg, 'value': vars(arguments)[arg]})
-
-    for param in update_params:
-        # arg[4:] will get rid of the set_ part of the string
-        sql = 'UPDATE {} SET {}=? WHERE {} like ?'.format(
-            table_name, param[0][4:], search_params['attribute'])
-        values = (all_args[param[0]], search_params['value'])
-        print(sql)
-        print(values)
-        cursor.execute(sql, values)
-    print('Successfully updated values')
-
-
-def remove_helper(cursor, arguments, valid_arguments, table_name):
-    """Helper function to remove rows from tables.
-
-    :param cursor: Cursor for SQL command execution.
-    :param arguments: All arguments passed to program.
-    :param valid_arguments: Tuple of valid column names to run a remove statement on.
-    :param table_name: Table to run remove statement against.
-    """
-    # Make sure one of these arguments were passed to the program
-    validate_command(arguments, valid=valid_arguments)
-    all_args = vars(arguments)
-    search_params = dict()
-
-    # Select the attribute the user decided to remove an employee by (remove by first_name, last_name, etc.)
-    for arg in valid_arguments:
-        if all_args[arg] is not None:
-            search_params.update({'attribute': arg, 'value': vars(arguments)[arg]})
-    print(search_params)
-
-    sql = 'DELETE FROM {} WHERE {} like ?'.format(table_name, search_params['attribute'])
-    value = (search_params['value'],)
-    cursor.execute(sql, value)
-    print('Successfully removed the values')
 
 
 def add_employee(cursor, arguments):
@@ -179,20 +56,8 @@ def add_employee(cursor, arguments):
     :param cursor: Cursor for SQL command execution.
     :param arguments: All arguments passed to program.
     """
-    # Make sure all of these arguments were passed to the program
-    required_args = ('first_name', 'last_name', 'number', 'job_id')
-    validate_command(arguments, required=required_args)
-
-    sql = 'INSERT INTO employee (first_name, last_name, phone, job_id) VALUES (?, ?, ?, ?)'
-    values = (
-        arguments.first_name,
-        arguments.last_name,
-        arguments.number,
-        int(arguments.job_id)
-    )
-    print(values)
-    cursor.execute(sql, values)
-    print('Successfully inserted the values')
+    required_args = ('first_name', 'last_name', 'phone', 'job_id')
+    add_helper(cursor, arguments, required_args, 'employee')
 
 
 def update_employee(cursor, arguments):
@@ -205,7 +70,7 @@ def update_employee(cursor, arguments):
     :param cursor: Cursor for SQL command execution.
     :param arguments: All arguments passed to program.
     """
-    valid_arguments = ('first_name', 'last_name', 'number', 'job_id', 'employee_id')
+    valid_arguments = ('first_name', 'last_name', 'phone', 'job_id', 'employee_id')
     update_arguments = ('set_first_name', 'set_last_name', 'set_phone', 'set_job_id')
     update_helper(cursor, arguments, valid_arguments, update_arguments, 'employee')
 
@@ -237,13 +102,7 @@ def add_department(cursor, arguments):
     :param arguments: All arguments passed to program.
     """
     required_args = ('department_name',)
-    validate_command(arguments, required=required_args)
-
-    sql = 'INSERT INTO department (department_name) VALUES (?)'
-    values = (arguments.department_name,)
-    print(values)
-    cursor.execute(sql, values)
-    print('Successfully added values.')
+    add_helper(cursor, arguments, required_args, 'department')
 
 
 def update_department(cursor, arguments):
@@ -289,16 +148,7 @@ def add_job(cursor, arguments):
     :param arguments: All arguments passed to program.
     """
     required_args = ('department_id', 'job_title')
-    validate_command(arguments, required_args)
-
-    sql = 'INSERT INTO job (department_id, job_title) VALUES (?, ?)'
-    values = (
-        arguments.department_id,
-        arguments.job_title,
-    )
-    print(values)
-    cursor.execute(sql, values)
-    print('Successfully inserted the values')
+    add_helper(cursor, arguments, required_args, 'job')
 
 
 def update_job(cursor, arguments):
@@ -319,7 +169,7 @@ def update_job(cursor, arguments):
 def remove_job(cursor, arguments):
     """Remove a job from job table.
 
-    Exampes:
+    Examples:
         python main.py --remove job --job_id 7
         python main.py -r job -j 7
 
@@ -331,3 +181,21 @@ def remove_job(cursor, arguments):
     """
     valid_args = ('job_title', 'job_id')
     remove_helper(cursor, arguments, valid_args, 'job')
+
+
+def select_all(cursor, table_name):
+    """Show all tables or contents of a specific table
+
+    Examples:
+        python main.py --show tables
+        python main.py -s department
+
+    :param cursor: cursor to mariadb
+    :param table_name: Name of table to display
+    """
+    if table_name == 'tables':
+        cursor.execute('SHOW tables')
+    else:
+        cursor.execute(f'SELECT * from {table_name}')
+    for row in cursor:
+        print(row)

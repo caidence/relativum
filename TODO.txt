@@ -1,0 +1,12 @@
+TODO: Create database backup script in backup.py in utils folder
+TODO: Decide whether or not removes and updates should support non-primary keys
+      -- If so, decide whether remove and update should support more than one column in the WHERE clause
+TODO: Add interactive methods for adding, removing, and updating tables
+      -- Create a --interactive flag
+      -- Create interactive_helper(cursor, arguments, valid_args, required_args, update_args)
+      -- Add documentation in README.md
+TODO: Create arguments to give employee raise
+      -- By manually typing in their new salary
+      -- Or by inputting a percent
+TODO: Simplify src/helper.py::remove_helper
+TODO: Simplify src/helper.py::update_helper
