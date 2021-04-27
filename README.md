@@ -2,6 +2,7 @@
 ------------------------------------------------
 # Table of Contents
 - [General](#general)
+  * [System Requirements](#system-requirements)
   * [Setup](#setup)
   * [Getting started](#getting-started)
   * [Help](#help)
@@ -21,6 +22,11 @@
 
 ## General
 ----------------------------------
+
+### System requirements
+This program *should be* cross platform for Windows, Mac, and Linux! There are, however, two system requirements for this program to work. You must have the following installed:
+1. Python 3.x
+2. MariaDB
 
 ### Setup
 Setup is simple: clone the repository then run the setup script :smile: that's it!
