@@ -58,6 +58,63 @@ Get help by typing
 python main.py -h
 python main.py --help
 ```
+Either of the above commands will display the following message.
+```bash
+usage: main.py [-h] [-u USERNAME] [-p PASSWORD] [-n HOSTNAME] [-d DATABASE] [-c] [-s {job,department,employee,tables,salary}] [-a {job,department,employee,salary}]
+               [-r {job,department,employee,salary}] [-U {job,department,employee,salary}] [--set_fn SET_FIRST_NAME] [--set_ln SET_LAST_NAME] [--set_phone SET_PHONE]
+               [--set_job_id SET_JOB_ID] [--set_name SET_DEPARTMENT_NAME] [--set_title SET_JOB_TITLE] [--set_department_id SET_DEPARTMENT_ID] [-f FIRST_NAME] [-l LAST_NAME]
+               [-N PHONE] [-j JOB_ID] [-e EMPLOYEE_ID] [-D DEPARTMENT_NAME] [-i DEPARTMENT_ID] [-t JOB_TITLE]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -u USERNAME, --username USERNAME
+                        Database username
+  -p PASSWORD, --password PASSWORD
+                        Database password
+  -n HOSTNAME, --hostname HOSTNAME
+                        Database hostname
+  -d DATABASE, --database DATABASE
+                        Database name
+  -c, --cache           Cache credentials
+  -s {job,department,employee,tables,salary}, --show {job,department,employee,tables,salary}
+                        Show contents of a table
+  -a {job,department,employee,salary}, --add {job,department,employee,salary}
+                        Add a row to a table
+  -r {job,department,employee,salary}, --remove {job,department,employee,salary}
+                        Remove a row from a table
+  -U {job,department,employee,salary}, --update {job,department,employee,salary}
+                        Update a row in a table
+  --set_fn SET_FIRST_NAME
+                        Set first name
+  --set_ln SET_LAST_NAME
+                        Set last name
+  --set_phone SET_PHONE
+                        Set employee phone number
+  --set_job_id SET_JOB_ID
+                        Set employee job ID
+  --set_name SET_DEPARTMENT_NAME
+                        Set department name
+  --set_title SET_JOB_TITLE
+                        Set job title
+  --set_department_id SET_DEPARTMENT_ID
+                        Set department ID
+  -f FIRST_NAME, --first_name FIRST_NAME
+                        Employee first name
+  -l LAST_NAME, --last_name LAST_NAME
+                        Employee last name
+  -N PHONE, --phone PHONE
+                        Phone number
+  -j JOB_ID, --job_id JOB_ID
+                        Employee job ID
+  -e EMPLOYEE_ID, --employee_id EMPLOYEE_ID
+                        Employee ID
+  -D DEPARTMENT_NAME, --department_name DEPARTMENT_NAME
+                        Department name
+  -i DEPARTMENT_ID, --department_id DEPARTMENT_ID
+                        Department ID
+  -t JOB_TITLE, --job_title JOB_TITLE
+                        Job title
+```
 
 ### Showing tables
 
