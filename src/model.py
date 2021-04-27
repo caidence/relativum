@@ -1,4 +1,5 @@
 # Local imports
+from enums import TableName
 from helper import (
     add_helper,
     update_helper,
@@ -16,15 +17,15 @@ def execute(connection, arguments):
 
     # Simulates vector of unordered maps of function pointers
     functors = {
-        'employee': {
+        TableName.employee.value: {
             'add': add_employee,
             'remove': remove_employee,
             'update': update_employee},
-        'department': {
+        TableName.department.value: {
             'add': add_department,
             'remove': remove_department,
             'update': update_department},
-        'job': {
+        TableName.job.value: {
             'add': add_job,
             'remove': remove_job,
             'update': update_job}
@@ -41,7 +42,7 @@ def execute(connection, arguments):
         functors[arguments.update]['update'](cursor, arguments)
 
     connection.commit()  # This line saves the changes made to the database
-    # Close connection once we're done with it
+    # Close connection once we're done with it. Program execution ends here
     cursor.close()
     connection.close()
 
@@ -57,7 +58,7 @@ def add_employee(cursor, arguments):
     :param arguments: All arguments passed to program.
     """
     required_args = ('first_name', 'last_name', 'phone', 'job_id')
-    add_helper(cursor, arguments, required_args, 'employee')
+    add_helper(cursor, arguments, required_args, TableName.employee.value)
 
 
 def update_employee(cursor, arguments):
@@ -72,7 +73,7 @@ def update_employee(cursor, arguments):
     """
     valid_arguments = ('first_name', 'last_name', 'phone', 'job_id', 'employee_id')
     update_arguments = ('set_first_name', 'set_last_name', 'set_phone', 'set_job_id')
-    update_helper(cursor, arguments, valid_arguments, update_arguments, 'employee')
+    update_helper(cursor, arguments, valid_arguments, update_arguments, TableName.employee.value)
 
 
 def remove_employee(cursor, arguments):
@@ -88,7 +89,7 @@ def remove_employee(cursor, arguments):
     :param arguments: All arguments passed to program.
     """
     valid_args = ('first_name', 'last_name', 'employee_id')
-    remove_helper(cursor, arguments, valid_args, 'employee')
+    remove_helper(cursor, arguments, valid_args, TableName.employee.value)
 
 
 def add_department(cursor, arguments):
@@ -102,7 +103,7 @@ def add_department(cursor, arguments):
     :param arguments: All arguments passed to program.
     """
     required_args = ('department_name',)
-    add_helper(cursor, arguments, required_args, 'department')
+    add_helper(cursor, arguments, required_args, TableName.department.value)
 
 
 def update_department(cursor, arguments):
@@ -117,7 +118,7 @@ def update_department(cursor, arguments):
     """
     valid_arguments = ('department_name', 'department_id')
     update_arguments = ('set_department_name',)
-    update_helper(cursor, arguments, valid_arguments, update_arguments, 'department')
+    update_helper(cursor, arguments, valid_arguments, update_arguments, TableName.department.value)
 
 
 def remove_department(cursor, arguments):
@@ -134,7 +135,7 @@ def remove_department(cursor, arguments):
     :param arguments: All arguments passed to program.
     """
     valid_args = ('department_id', 'department_name')
-    remove_helper(cursor, arguments, valid_args, 'department')
+    remove_helper(cursor, arguments, valid_args, TableName.department.value)
 
 
 def add_job(cursor, arguments):
@@ -148,7 +149,7 @@ def add_job(cursor, arguments):
     :param arguments: All arguments passed to program.
     """
     required_args = ('department_id', 'job_title')
-    add_helper(cursor, arguments, required_args, 'job')
+    add_helper(cursor, arguments, required_args, TableName.job.value)
 
 
 def update_job(cursor, arguments):
@@ -163,7 +164,7 @@ def update_job(cursor, arguments):
         """
     valid_arguments = ('job_title', 'job_id')
     update_arguments = ('set_job_title', 'set_department_id')
-    update_helper(cursor, arguments, valid_arguments, update_arguments, 'job')
+    update_helper(cursor, arguments, valid_arguments, update_arguments, TableName.job.value)
 
 
 def remove_job(cursor, arguments):
@@ -180,7 +181,7 @@ def remove_job(cursor, arguments):
     :param arguments: All arguments passed to program.
     """
     valid_args = ('job_title', 'job_id')
-    remove_helper(cursor, arguments, valid_args, 'job')
+    remove_helper(cursor, arguments, valid_args, TableName.job.value)
 
 
 def select_all(cursor, table_name):

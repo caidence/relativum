@@ -12,4 +12,3 @@ TODO: Create arguments to give employee raise
 TODO: Simplify src/helper.py::remove_helper
 TODO: Simplify src/helper.py::update_helper
 TODO: Fix the (probably hundreds of) typos in the documentation since english is my worst language for spelling lol
-TODO: Table names should probably be in an enum
